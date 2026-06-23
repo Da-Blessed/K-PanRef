@@ -8,7 +8,7 @@ Minigraph-Cactus output files of the K-PanRef are available at zenodo.
 ## Data
 Raw sequencing data are available at K-BDS.
 
-Assembly files(.fasta) are available at K-BDS.
+Assembly files (.fasta) are available at K-BDS.
 
 ## Publication
   
