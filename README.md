@@ -5,6 +5,8 @@ The first graph-based Korean Pangenome Reference constructed by 13 haplotype-pha
 ## Files
 Minigraph-Cactus output files of the K-PanRef are available at zenodo.  
 
+https://doi.org/10.5281/zenodo.20810335
+
 ## Data
 Raw sequencing data are available at K-BDS.
 
