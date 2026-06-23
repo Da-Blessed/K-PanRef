@@ -10,5 +10,8 @@ Raw sequencing data are available at K-BDS.
 
 Assembly files(.fasta) are available at K-BDS.
 
+## Publication
+
+
 ## Contact
 Correspondence to Jong Bhak (jong.bhak@gmail.com)
