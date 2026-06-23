@@ -1,1 +1,1 @@
-Original code from (https://github.com/Yoonsung1203) 
+Original code from https://github.com/Yoonsung1203
