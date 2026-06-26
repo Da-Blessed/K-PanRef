@@ -39,8 +39,8 @@ def plot_variant_stats(per_sample_path, annot_paths, venn_path, output_path):
     df_venn.columns = df_venn.columns.str.strip()
 
     colors = {
-        "Control": "#3D7A52",  
-        "MI":      "#C9A227",  
+        "Control": "#3D7A52",
+        "MI":      "#C9A227",
     }
 
     box_metrics = ["SNV", "InDel", "SV"]
@@ -99,9 +99,9 @@ def plot_variant_stats(per_sample_path, annot_paths, venn_path, output_path):
         all_data = np.concatenate(data_list)
         data_min = np.min(all_data)
         data_max = np.max(all_data)
-        data_median = np.median(all_data)
-        margin = data_max - data_median
-        ax.set_ylim(data_min - margin, None)
+
+        margin = (data_max - data_min) * 6.0
+        ax.set_ylim(data_min - margin * 0.5, data_max + margin * 0.5)
 
         ax.set_title(title, fontsize=14, fontweight='bold', color='black', pad=15)
         ax.set_xticks(positions)
@@ -116,10 +116,6 @@ def plot_variant_stats(per_sample_path, annot_paths, venn_path, output_path):
         ax.spines['bottom'].set_color('black')
         ax.tick_params(colors='black', labelsize=12)
         ax.yaxis.grid(False)
-
-        if idx == 2:
-            margin2 = (data_max - data_min) * 0.5
-            ax.set_ylim(data_min - margin2, data_max + margin2)
 
         ax.yaxis.set_major_locator(MaxNLocator(integer=True))
         ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{int(x)}'))
