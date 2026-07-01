@@ -146,7 +146,7 @@ def plot_combined(graph_stats_path, panacus_path, output_path):
 
 #%%
 if __name__ == "__main__":
-    graph_stats_path = "/BiO/Research/Project5/Korean_Pangenome_Graph_Assembly/Results/7.tables/2.graph_stats/0.graph_stats.tsv"
-    panacus_path = "/BiO/Research/Project5/Korean_Pangenome_Graph_Assembly/Results/2.panacus/0.ordered_histgrowth/0.KPanRef/KPanRef_ordered-histgrowth_bp.tsv"
-    output_path  = "/BiO/Research/Project4/Project1/Korean_Pangenome_Graph_Assembly/Results/6.plots/4.main_fig/0.fig1.svg"
+    graph_stats_path = $PATH
+    panacus_path = $PATH
+    output_path  = $PATH
     plot_combined(graph_stats_path, panacus_path, output_path)
