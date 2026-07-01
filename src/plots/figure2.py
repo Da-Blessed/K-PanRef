@@ -59,25 +59,16 @@ def plot_variant_stats(per_sample_path, annot_paths, venn_path, output_path):
         else:
             return f'{v:,}'
 
-    fig = plt.figure(figsize=(18, 14))
+    fig = plt.figure(figsize=(15, 15))
     fig.patch.set_facecolor('white')
 
-    gs_top = gridspec.GridSpec(2, 3, figure=fig, hspace=0.45, wspace=0.35,
-                               top=0.95, bottom=0.42)
-    gs_bot = gridspec.GridSpec(1, 3, figure=fig, wspace=0.3,
-                               top=0.36, bottom=0.06)
+    gs = gridspec.GridSpec(3, 3, figure=fig, hspace=0.45, wspace=0.4)
 
-    axes = np.empty((2, 3), dtype=object)
-    for i in range(2):
-        for j in range(3):
-            axes[i, j] = fig.add_subplot(gs_top[i, j])
-
-    ax_venn_small = fig.add_subplot(gs_bot[0, 0])
-    ax_venn_sv    = fig.add_subplot(gs_bot[0, 1])
-
+    axes_top = []
     for idx, (metric, title, ylabel, scale) in enumerate(zip(box_metrics, box_titles, box_ylabels, box_scales)):
-        ax = axes[0, idx]
+        ax = fig.add_subplot(gs[0, idx])
         ax.set_facecolor('white')
+        axes_top.append(ax)
 
         data_list  = []
         graph_list = []
@@ -111,13 +102,15 @@ def plot_variant_stats(per_sample_path, annot_paths, venn_path, output_path):
         ax.spines['right'].set_visible(False)
         ax.spines['left'].set_color('black')
         ax.spines['bottom'].set_color('black')
-        ax.tick_params(colors='black', labelsize=12)
+        ax.tick_params(colors='black', labelsize=11)
         ax.yaxis.grid(False)
         ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{int(x)}'))
 
+    axes_mid = []
     for idx, graph in enumerate(["KPanRef", "CPC", "HPRC"]):
-        ax = axes[1, idx]
+        ax = fig.add_subplot(gs[1, idx])
         ax.set_facecolor('white')
+        axes_mid.append(ax)
 
         color = colors.get(graph, "#555555")
         sv_len_orig = annot_dfs[graph]["SV_length"].dropna()
@@ -135,11 +128,11 @@ def plot_variant_stats(per_sample_path, annot_paths, venn_path, output_path):
         )
         ax.text(0.98, 0.98, stats_text,
                 transform=ax.transAxes,
-                fontsize=10, va='top', ha='right',
+                fontsize=8, va='top', ha='right',
                 color='black', fontweight='bold',
                 bbox=dict(boxstyle='round,pad=0.3', facecolor='white', edgecolor='#CCCCCC', alpha=0.8))
 
-        ax.set_title(f"{display_names.get(graph, graph)} SV Length Distribution", fontsize=14, fontweight='bold', color='black', pad=15)
+        ax.set_title(f"{display_names.get(graph, graph)}", fontsize=14, fontweight='bold', color='black', pad=15)
         ax.set_xlabel("kb", fontsize=12, fontweight='bold')
         if idx == 0:
             ax.set_ylabel("Count (k)", fontsize=12, fontweight='bold')
@@ -147,15 +140,18 @@ def plot_variant_stats(per_sample_path, annot_paths, venn_path, output_path):
             ax.set_ylabel("")
         ax.set_xticks(np.arange(0, 10100, 1000))
         ax.set_xticklabels(
-            [str(int(b/1e3)) for b in np.arange(0, 10100, 1000)]
+            [str(int(b/1e3)) for b in np.arange(0, 10100, 1000)], fontsize=11
         )
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
         ax.spines['left'].set_color('black')
         ax.spines['bottom'].set_color('black')
-        ax.tick_params(colors='black', labelsize=12)
+        ax.tick_params(colors='black', labelsize=11)
         ax.yaxis.grid(False)
         ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{int(x/1e3)}'))
+
+    ax_venn_small = fig.add_subplot(gs[2, 0])
+    ax_venn_sv    = fig.add_subplot(gs[2, 1])
 
     def draw_venn(ax, vtype, vtitle):
         ax.set_facecolor('white')
@@ -181,12 +177,12 @@ def plot_variant_stats(per_sample_path, annot_paths, venn_path, output_path):
             lbl = v.get_label_by_id(label_id)
             if lbl:
                 lbl.set_text(fmt_val(val))
-                lbl.set_fontsize(12)
+                lbl.set_fontsize(11)
                 lbl.set_fontweight('bold')
 
         for lbl in v.set_labels:
             if lbl:
-                lbl.set_fontsize(12)
+                lbl.set_fontsize(11)
                 lbl.set_fontweight('bold')
 
         ax.set_title(vtitle, fontsize=14, fontweight='bold', color='black', pad=15)
@@ -195,7 +191,7 @@ def plot_variant_stats(per_sample_path, annot_paths, venn_path, output_path):
     draw_venn(ax_venn_sv,    "SV",            "SV")
 
     fig.canvas.draw()
-    label_axes = [axes[0, 0], axes[1, 0], ax_venn_small]
+    label_axes = [axes_top[0], axes_mid[0], ax_venn_small]
     labels     = ['A', 'B', 'C']
     for ax, label in zip(label_axes, labels):
         bbox = ax.get_position()
@@ -207,12 +203,12 @@ def plot_variant_stats(per_sample_path, annot_paths, venn_path, output_path):
 
 #%%
 if __name__ == "__main__":
-    per_sample_path = $PATH
+    per_sample_path = "/BiO/Research/Project4/Project1/Korean_Pangenome_Graph_Assembly/Results/7.tables/3.variant_stats/1.per_sample_variant_stats.tsv"
     annot_paths = {
-        "KPanRef": $PATH,
-        "CPC":     $PATH,
-        "HPRC":    $PATH,
+        "KPanRef": "/BiO/Research/Project4/Project1/Korean_Pangenome_Graph_Assembly/Results/1.minigraph-cactus/14.annot_SV_total/0.KPanRef/KPanRef_merged.tsv",
+        "CPC":     "/BiO/Research/Project4/Project1/Korean_Pangenome_Graph_Assembly/Results/1.minigraph-cactus/14.annot_SV_total/2.CPC/CPC_merged.tsv",
+        "HPRC":    "/BiO/Research/Project4/Project1/Korean_Pangenome_Graph_Assembly/Results/1.minigraph-cactus/14.annot_SV_total/4.HPRC/HPRC_merged.tsv",
     }
-    venn_path   = $PATH
-    output_path = $PATH
+    venn_path   = "/BiO/Research/Project4/Project1/Korean_Pangenome_Graph_Assembly/Results/7.tables/3.variant_stats/2.graph_specific_variant_stats.tsv"
+    output_path = "/BiO/Research/Project4/Project1/Korean_Pangenome_Graph_Assembly/Results/6.plots/4.main_fig/1.fig2.svg"
     plot_variant_stats(per_sample_path, annot_paths, venn_path, output_path)
