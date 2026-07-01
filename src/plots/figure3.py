@@ -228,11 +228,11 @@ def plot_variant_stats(per_sample_path, annot_paths, venn_path, output_path):
 
 #%%
 if __name__ == "__main__":
-    per_sample_path = "/BiO/Research/Project4/Project1/Korean_Pangenome_Graph_Assembly/Results/7.tables/3.variant_stats/7.pangenie_per_sample_variant_stats.tsv"
+    per_sample_path = $PATH
     annot_paths = {
-        "Control": "/BiO/Research/Project4/Project1/Korean_Pangenome_Graph_Assembly/Results/4.pangenie/17.annot_SV_total/control/pangenie_control_CHM13.tsv",
-        "MI":      "/BiO/Research/Project4/Project1/Korean_Pangenome_Graph_Assembly/Results/4.pangenie/17.annot_SV_total/MI/pangenie_MI_CHM13.tsv",
+        "Control": $PATH,
+        "MI":      $PATH,
     }
-    venn_path   = "/BiO/Research/Project4/Project1/Korean_Pangenome_Graph_Assembly/Results/7.tables/3.variant_stats/8.disease_specific_variant_stats.tsv"
-    output_path = "/BiO/Research/Project4/Project1/Korean_Pangenome_Graph_Assembly/Results/6.plots/4.main_fig/2.fig3.svg"
+    venn_path   = $PATH
+    output_path = $PATH
     plot_variant_stats(per_sample_path, annot_paths, venn_path, output_path)
