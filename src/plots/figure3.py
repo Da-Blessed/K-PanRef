@@ -56,31 +56,16 @@ def plot_variant_stats(per_sample_path, annot_paths, venn_path, output_path):
         else:
             return f'{v:,}'
 
-    fig = plt.figure(figsize=(22, 12))
+    fig = plt.figure(figsize=(15, 15))
     fig.patch.set_facecolor('white')
 
-    gs_top = gridspec.GridSpec(1, 3, figure=fig, wspace=0.35,
-                               top=0.95, bottom=0.54)
-    gs_bot = gridspec.GridSpec(1, 3, figure=fig, wspace=0.3,
-                               top=0.40, bottom=0.05)
+    gs = gridspec.GridSpec(3, 3, figure=fig, hspace=0.45, wspace=0.4)
 
-    axes = np.empty((1, 3), dtype=object)
-    for j in range(3):
-        axes[0, j] = fig.add_subplot(gs_top[0, j])
-
-    ax_sv_hist    = fig.add_subplot(gs_bot[0, 0])
-    ax_venn_small = fig.add_subplot(gs_bot[0, 1])
-    ax_venn_sv    = fig.add_subplot(gs_bot[0, 2])
-
-    pos = ax_sv_hist.get_position()
-    shrink = 0.86
-    new_height = pos.height * shrink
-    new_y0 = pos.y0 + (pos.height - new_height) / 2
-    ax_sv_hist.set_position([pos.x0, new_y0, pos.width, new_height])
-
+    axes_top = []
     for idx, (metric, title, ylabel, scale) in enumerate(zip(box_metrics, box_titles, box_ylabels, box_scales)):
-        ax = axes[0, idx]
+        ax = fig.add_subplot(gs[0, idx])
         ax.set_facecolor('white')
+        axes_top.append(ax)
 
         data_list  = []
         graph_list = []
@@ -114,13 +99,21 @@ def plot_variant_stats(per_sample_path, annot_paths, venn_path, output_path):
         ax.spines['right'].set_visible(False)
         ax.spines['left'].set_color('black')
         ax.spines['bottom'].set_color('black')
-        ax.tick_params(colors='black', labelsize=12)
+        ax.tick_params(colors='black', labelsize=11)
         ax.yaxis.grid(False)
 
         ax.yaxis.set_major_locator(MaxNLocator(integer=True))
         ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{int(x)}'))
 
+    ax_sv_hist = fig.add_subplot(gs[1:3, 0:2])
     ax_sv_hist.set_facecolor('white')
+
+    pos = ax_sv_hist.get_position()
+    shrink = 0.885
+    new_height = pos.height * shrink
+    new_y0 = pos.y0 + (pos.height - new_height) / 2
+    ax_sv_hist.set_position([pos.x0, new_y0, pos.width, new_height])
+
     alphas = {"Control": 0.5, "MI": 0.7}
     sv_lens = {}
     for graph in ["Control", "MI"]:
@@ -140,9 +133,9 @@ def plot_variant_stats(per_sample_path, annot_paths, venn_path, output_path):
         mpatches.Patch(facecolor=colors["MI"] + '99', edgecolor=colors["MI"],
                        alpha=0.7, label='MI'),
     ]
-    ax_sv_hist.legend(handles=legend_elements, fontsize=10, frameon=True, loc='upper right')
+    ax_sv_hist.legend(handles=legend_elements, fontsize=11, frameon=True, loc='upper right')
 
-    ax_sv_hist.set_title("SV Length Distribution", fontsize=14, fontweight='bold', color='black', pad=15)
+    ax_sv_hist.set_title("SV Size Distribution", fontsize=14, fontweight='bold', color='black', pad=15)
     ax_sv_hist.set_xlabel("kb", fontsize=12, fontweight='bold')
     ax_sv_hist.set_ylabel("Count (k)", fontsize=12, fontweight='bold')
     ax_sv_hist.set_xticks(np.arange(0, 10100, 1000))
@@ -151,7 +144,7 @@ def plot_variant_stats(per_sample_path, annot_paths, venn_path, output_path):
     ax_sv_hist.spines['right'].set_visible(False)
     ax_sv_hist.spines['left'].set_color('black')
     ax_sv_hist.spines['bottom'].set_color('black')
-    ax_sv_hist.tick_params(colors='black', labelsize=12)
+    ax_sv_hist.tick_params(colors='black', labelsize=11)
     ax_sv_hist.yaxis.grid(False)
     ax_sv_hist.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{int(x/1e3)}'))
 
@@ -181,6 +174,10 @@ def plot_variant_stats(per_sample_path, annot_paths, venn_path, output_path):
     ax_inset.spines['bottom'].set_color('black')
     ax_inset.yaxis.grid(False)
 
+    gs_venn = gridspec.GridSpecFromSubplotSpec(2, 1, subplot_spec=gs[1:3, 2], hspace=0.3)
+    ax_venn_small = fig.add_subplot(gs_venn[0, 0])
+    ax_venn_sv    = fig.add_subplot(gs_venn[1, 0])
+
     def draw_venn(ax, vtype, vtitle):
         ax.set_facecolor('white')
         row = df_venn[df_venn["Type"] == vtype].iloc[0]
@@ -205,12 +202,12 @@ def plot_variant_stats(per_sample_path, annot_paths, venn_path, output_path):
             lbl = v.get_label_by_id(label_id)
             if lbl:
                 lbl.set_text(fmt_val(val))
-                lbl.set_fontsize(12)
+                lbl.set_fontsize(11)
                 lbl.set_fontweight('bold')
 
         for lbl in v.set_labels:
             if lbl:
-                lbl.set_fontsize(12)
+                lbl.set_fontsize(11)
                 lbl.set_fontweight('bold')
 
         ax.set_title(vtitle, fontsize=14, fontweight='bold', color='black', pad=15)
@@ -219,7 +216,7 @@ def plot_variant_stats(per_sample_path, annot_paths, venn_path, output_path):
     draw_venn(ax_venn_sv,    "SV",            "SV")
 
     fig.canvas.draw()
-    label_axes = [axes[0, 0], ax_sv_hist, ax_venn_small]
+    label_axes = [axes_top[0], ax_sv_hist, ax_venn_small]
     labels     = ['A', 'B', 'C']
     for ax, label in zip(label_axes, labels):
         bbox = ax.get_position()
@@ -231,11 +228,11 @@ def plot_variant_stats(per_sample_path, annot_paths, venn_path, output_path):
 
 #%%
 if __name__ == "__main__":
-    per_sample_path = $PATH
+    per_sample_path = "/BiO/Research/Project4/Project1/Korean_Pangenome_Graph_Assembly/Results/7.tables/3.variant_stats/7.pangenie_per_sample_variant_stats.tsv"
     annot_paths = {
-        "Control": $PATH,
-        "MI":      $PATH,
+        "Control": "/BiO/Research/Project4/Project1/Korean_Pangenome_Graph_Assembly/Results/4.pangenie/17.annot_SV_total/control/pangenie_control_CHM13.tsv",
+        "MI":      "/BiO/Research/Project4/Project1/Korean_Pangenome_Graph_Assembly/Results/4.pangenie/17.annot_SV_total/MI/pangenie_MI_CHM13.tsv",
     }
-    venn_path   = $PATH
-    output_path = $PATH
+    venn_path   = "/BiO/Research/Project4/Project1/Korean_Pangenome_Graph_Assembly/Results/7.tables/3.variant_stats/8.disease_specific_variant_stats.tsv"
+    output_path = "/BiO/Research/Project4/Project1/Korean_Pangenome_Graph_Assembly/Results/6.plots/4.main_fig/2.fig3.svg"
     plot_variant_stats(per_sample_path, annot_paths, venn_path, output_path)
