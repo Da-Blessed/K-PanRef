@@ -38,10 +38,10 @@ def plot_combined(graph_stats_path, panacus_path, output_path):
     scales  = [1, 1e6, 1e6, 1e9]
     ylabels = ["Count", "Count (M)", "Count (M)", "Count (G)"]
 
-    fig = plt.figure(figsize=(18, 20))
+    fig = plt.figure(figsize=(20, 20))
     fig.patch.set_facecolor('white')
 
-    gs = gridspec.GridSpec(4, 4, figure=fig, hspace=0.45, wspace=0.35)
+    gs = gridspec.GridSpec(4, 4, figure=fig, hspace=0.45, wspace=0.4)
 
     axes_top = []
     for idx, (metric, scale, ylabel) in enumerate(zip(metrics, scales, ylabels)):
@@ -56,36 +56,36 @@ def plot_combined(graph_stats_path, panacus_path, output_path):
 
         ax.bar(x, vals, color=bar_colors, edgecolor=edge_colors, linewidth=1.2, width=0.5)
 
-        ax.set_title(metric, fontsize=14, fontweight='bold', color='black', pad=15)
-        ax.set_ylabel(ylabel, fontsize=12, fontweight='bold')
+        ax.set_title(metric, fontsize=18, fontweight='bold', color='black', pad=15)
+        ax.set_ylabel(ylabel, fontsize=15, fontweight='bold')
         ax.set_xticks(x)
-        ax.set_xticklabels([display_names.get(g, g) for g in df_graph["Graph"]], fontsize=10, fontweight='bold')
+        ax.set_xticklabels([display_names.get(g, g) for g in df_graph["Graph"]], fontsize=14, fontweight='bold')
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
         ax.spines['left'].set_color('black')
         ax.spines['bottom'].set_color('black')
-        ax.tick_params(colors='black', labelsize=11)
+        ax.tick_params(colors='black', labelsize=14)
         ax.yaxis.grid(False)
 
         if metric == "Sample Size":
             for bar, val in zip(ax.patches, vals):
                 ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + vals.max() * 0.02,
-                        f'{int(val)}', ha='center', va='bottom', fontsize=10, fontweight='bold')
+                        f'{int(val)}', ha='center', va='bottom', fontsize=13, fontweight='bold')
         elif metric == "Length":
             for bar, val in zip(ax.patches, vals):
                 ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + (vals.max() - vals.min()) * 0.05,
-                        f'{val:.2f}', ha='center', va='bottom', fontsize=10, fontweight='bold')
+                        f'{val:.2f}', ha='center', va='bottom', fontsize=13, fontweight='bold')
         else:
             for bar, val in zip(ax.patches, vals):
                 ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + vals.max() * 0.02,
-                        f'{val:.1f}', ha='center', va='bottom', fontsize=10, fontweight='bold')
+                        f'{val:.1f}', ha='center', va='bottom', fontsize=13, fontweight='bold')
 
         if metric == "Length":
             margin = (vals.max() - vals.min()) * 0.3
             ax.set_ylim(vals.min() - margin, vals.max() + margin)
             ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{x:.2f}'))
 
-    ax_pan = fig.add_subplot(gs[1:4, :])
+    ax_pan = fig.add_subplot(gs[1:3, :])
     ax_pan.set_facecolor('white')
 
     df_pan = parse_panacus(panacus_path)
@@ -113,26 +113,32 @@ def plot_combined(graph_stats_path, panacus_path, output_path):
         mpatches.Patch(facecolor=color_core + '99', edgecolor=color_core, label='Core (≥95%)'),
     ]
 
-    ax_pan.set_title("Pangenome Growth", fontsize=14, fontweight='bold', color='black', pad=15)
-    ax_pan.set_ylabel("Added Sequences (Mb)", fontsize=12, fontweight='bold')
-    ax_pan.set_xlabel("Samples", fontsize=12, fontweight='bold')
-    ax_pan.set_xticks([])
+    ax_pan.set_title("Pangenome Growth", fontsize=18, fontweight='bold', color='black', pad=15)
+    ax_pan.set_ylabel("Added Sequences (Mb)", fontsize=15, fontweight='bold')
+    ax_pan.set_xlabel("Number of Samples", fontsize=15, fontweight='bold')
+
+    n_samples = len(df_pan)
+    step = max(1, n_samples // 15)
+    xtick_pos = np.arange(0, n_samples, step)
+    ax_pan.set_xticks(xtick_pos)
+    ax_pan.set_xticklabels([str(i+1) for i in xtick_pos], fontsize=14)
+
     ax_pan.margins(x=0.01)
     ax_pan.spines['top'].set_visible(False)
     ax_pan.spines['right'].set_visible(False)
     ax_pan.spines['left'].set_color('black')
     ax_pan.spines['bottom'].set_color('black')
-    ax_pan.tick_params(colors='black', labelsize=10)
+    ax_pan.tick_params(colors='black', labelsize=14)
     ax_pan.yaxis.grid(False)
     ax_pan.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{int(x)}'))
-    ax_pan.legend(handles=legend_elements, fontsize=11, frameon=True, loc='upper left')
+    ax_pan.legend(handles=legend_elements, fontsize=14, frameon=True, loc='upper left')
 
     fig.canvas.draw()
     label_axes = [axes_top[0], ax_pan]
     labels     = ['A', 'B']
     for ax, label in zip(label_axes, labels):
         bbox = ax.get_position()
-        fig.text(bbox.x0 - 0.02, bbox.y1 + 0.01, label, fontsize=16, fontweight='bold',
+        fig.text(bbox.x0 - 0.02, bbox.y1 + 0.01, label, fontsize=20, fontweight='bold',
                  color='black', va='bottom', ha='left', transform=fig.transFigure)
 
     plt.savefig(output_path, bbox_inches='tight', format='svg')
@@ -140,7 +146,7 @@ def plot_combined(graph_stats_path, panacus_path, output_path):
 
 #%%
 if __name__ == "__main__":
-    graph_stats_path = $PATH
-    panacus_path = $PATH
-    output_path  = $PATH
+    graph_stats_path = "/BiO/Research/Project5/Korean_Pangenome_Graph_Assembly/Results/7.tables/2.graph_stats/0.graph_stats.tsv"
+    panacus_path = "/BiO/Research/Project5/Korean_Pangenome_Graph_Assembly/Results/2.panacus/0.ordered_histgrowth/0.KPanRef/KPanRef_ordered-histgrowth_bp.tsv"
+    output_path  = "/BiO/Research/Project4/Project1/Korean_Pangenome_Graph_Assembly/Results/6.plots/4.main_fig/0.fig1.svg"
     plot_combined(graph_stats_path, panacus_path, output_path)
